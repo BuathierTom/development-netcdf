@@ -32,18 +32,21 @@ def xlsx_to_nc(path):
                 
             else:    
                 col_names[i] = col_names[i].split('(')[0]
-                col_names[i] = col_names[i].strip()
                 col_names[i] = col_names[i].split(')')[0]
+                
+        
+        
                 
         df.columns = col_names
         
         df = df.set_index(col_names)
         # On les convertit pour les mettre dans un fichier netcdf
         xr = df.to_xarray()
-        nc = xr.to_netcdf('./TESTS/XLSX_RADEAU/' + file[:-5] +'.nc')
+        print(xr)
+        nc = xr.to_netcdf('./tests/XLSX_RADEAU/' + file[:-5] +'.nc')
     
     
 if __name__ == "__main__":
-    path = './data_example/data_radeau/'
+    path = './data/data_example/data_radeau/'
     xlsx_to_nc(path)
  

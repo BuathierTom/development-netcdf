@@ -49,7 +49,7 @@ def nc_to_xlsx__TRANS(path):
 
 def nc_to_xlsx():
         
-        ds = nc4.Dataset('./TESTS/XLSX_COMPIL/compil_Guyane_Nov2017_J1-1_180.nc') # type: ignore
+        ds = nc4.Dataset('okeyy.nc') # type: ignore
     
         # On recupere les variables
         var = ds.variables
