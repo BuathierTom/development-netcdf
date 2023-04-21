@@ -49,7 +49,9 @@ def nc_to_xlsx__TRANS(path):
 
 def nc_to_xlsx():
         
-        ds = nc4.Dataset('okeyy.nc') # type: ignore
+        ds = xr.open_dataset('okeyy.nc')
+        
+        print(ds)
     
         # On recupere les variables
         var = ds.variables
