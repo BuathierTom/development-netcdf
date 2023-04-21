@@ -77,24 +77,51 @@ def test():
         col_values2.append(list(df[col_name]))
 
     # On créé un dictionnaire pour stocker les noms des colonnes et les valeurs 
-    col_names_values2 = dict(zip(col_names_no_unit, col_values2))
+    col_names_values2 = dict(zip(col_names_no_unit, col_values2))    
+    
+    coords = {}
+    # On fais une boucle for pour parcourir tout les noms de la liste col_names_clean et on affiche la valeur de la colonne
+    for i in col_names_clean:
+        # On ajoute les valeurs de la colonne dans le dictionnaire coords
+        coords[i] = (i, col_names_values[i])
+        # print(coords)
+    # xr.Dataset(data_vars=None, coords=None, attrs=None, compat='broadcast_equals', indexes=None, name=None, fastpath=False)
+    
+    print({})
 
-    # On créé la dataset
+    # On créé une dataset avec toutes les valeurs et on y met dans la section Data Variables
     ds = xr.Dataset(
-        coords = {
-            # On prend les valeurs de col_names_values en fonction du nom
-            i: (i, col_names_values[i]) for i in col_names_clean
-        },  
+        coords=coords,
         
-        # data_vars= {
-        #     # On prend les valeurs de col_names_values2 en fonction de leur nom contenu dans col_names_no_unit
-        #     col_name: (col_names_values2[col_name]) for col_name in col_names_no_unit
-        #     },
-        attrs = global_attributes
+        data_vars={
+            i: (col_names_values2[i]) for i in col_names_no_unit
+        },
+        attrs=global_attributes
     )
 
-    print(ds)
+    # Ajout des attributs pour chaque variable
+    # Pour les long_names // TODO : ajouter les long_names
+    for i in col_names_clean:
+        ds[i].attrs['units'] = col_names_units[i]
+        ds[i].attrs['long_name'] = i
+        ds[i].attrs['standard_name'] = i
+        ds[i].attrs['axis'] = 'T'
+        ds[i].attrs['valid_min'] = np.min(col_names_values[i])
+        ds[i].attrs['valid_max'] = np.max(col_names_values[i])
+        ds[i].attrs['valid_delta'] = np.max(col_names_values[i]) - np.min(col_names_values[i])
+        ds[i].attrs['valid_range'] = [np.min(col_names_values[i]), np.max(col_names_values[i])]
+        ds[i].attrs['missing_value'] = -9999
+        ds[i].attrs['fill_value'] = -9999
+        ds[i].attrs['comment'] = 'Data from Guyane'
+        ds[i].attrs['reference'] = 'https://www.cnrs.fr/'
+        ds[i].attrs['history'] = 'Created by the CNRS'
+        ds[i].attrs['source'] = 'Data from Guyane'
+        ds[i].attrs['title'] = 'Data from Guyane'
+        ds[i].attrs['institution'] = 'CNRS'
+        ds[i].attrs['Conventions'] = 'CF-1.6'
 
+    print(ds)
+    
     # on créé le fichier netcdf avec la dataset
     ds.to_netcdf('okeyy.nc')
 

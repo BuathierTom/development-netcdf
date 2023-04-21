@@ -49,10 +49,9 @@ def nc_to_xlsx__TRANS(path):
 
 def nc_to_xlsx():
         
-        ds = xr.open_dataset('okeyy.nc')
+        # On utilise la package netCDF4 car le package xarray fonctionne un peu moins bien pour la lecture. 
+        ds =  nc4.Dataset('okeyy.nc') # type: ignore
         
-        print(ds)
-    
         # On recupere les variables
         var = ds.variables
         # On récupere toutes les données des variables
@@ -64,11 +63,6 @@ def nc_to_xlsx():
         dico = {}
         for i in range(len(var_names)):
             dico[var_names[i]] = data[i]
-
-        
-        # print("LENGHT DATA: ", data)
-        # print("LENGHT NAMES: ", var_names)
-        
         
         # On met dans la dataframe les noms de variables et la data
         df = pd.DataFrame.from_dict(dico, orient='index')
@@ -77,6 +71,7 @@ def nc_to_xlsx():
         
         # On sauvegarde le fichier
         df.to_excel('./TESTS/sdk.xlsx')       
+        print("Fichier sauvegardé avec succès")
         
 
 if __name__ == "__main__":
