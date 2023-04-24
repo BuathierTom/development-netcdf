@@ -53,7 +53,7 @@ def test():
         'Conventions': 'CF-1.6',
     }
     # on choppe les valeurs de la colonne en rajoutant le nom de la colonne et l'unite
-    # time = sorted(list(set(df[col_names_clean[0]+"("+col_names_units[col_names_clean[0]]+")"])))
+    # time = list(set(df[col_names_clean[0]+"("+col_names_units[col_names_clean[0]]+")"]))
 
     # On fais pareil pour toutes les autres colonnes
     # On créé une liste vide pour stocker les valeurs de chaque colonne
@@ -83,42 +83,38 @@ def test():
     # On fais une boucle for pour parcourir tout les noms de la liste col_names_clean et on affiche la valeur de la colonne
     for i in col_names_clean:
         # On ajoute les valeurs de la colonne dans le dictionnaire coords
-        coords[i] = (i, col_names_values[i])
-        # print(coords)
-    # xr.Dataset(data_vars=None, coords=None, attrs=None, compat='broadcast_equals', indexes=None, name=None, fastpath=False)
+        coords[i] = ("Coords", col_names_values[i])
     
-    print({})
-
     # On créé une dataset avec toutes les valeurs et on y met dans la section Data Variables
     ds = xr.Dataset(
         coords=coords,
         
         data_vars={
-            i: (col_names_values2[i]) for i in col_names_no_unit
+            i: ("Variables", col_names_values2[i]) for i in col_names_no_unit
         },
         attrs=global_attributes
     )
 
-    # Ajout des attributs pour chaque variable
-    # Pour les long_names // TODO : ajouter les long_names
-    for i in col_names_clean:
-        ds[i].attrs['units'] = col_names_units[i]
-        ds[i].attrs['long_name'] = i
-        ds[i].attrs['standard_name'] = i
-        ds[i].attrs['axis'] = 'T'
-        ds[i].attrs['valid_min'] = np.min(col_names_values[i])
-        ds[i].attrs['valid_max'] = np.max(col_names_values[i])
-        ds[i].attrs['valid_delta'] = np.max(col_names_values[i]) - np.min(col_names_values[i])
-        ds[i].attrs['valid_range'] = [np.min(col_names_values[i]), np.max(col_names_values[i])]
-        ds[i].attrs['missing_value'] = -9999
-        ds[i].attrs['fill_value'] = -9999
-        ds[i].attrs['comment'] = 'Data from Guyane'
-        ds[i].attrs['reference'] = 'https://www.cnrs.fr/'
-        ds[i].attrs['history'] = 'Created by the CNRS'
-        ds[i].attrs['source'] = 'Data from Guyane'
-        ds[i].attrs['title'] = 'Data from Guyane'
-        ds[i].attrs['institution'] = 'CNRS'
-        ds[i].attrs['Conventions'] = 'CF-1.6'
+    # # Ajout des attributs pour chaque variable
+    # # Pour les long_names -- TODO : ajouter les long_names
+    # for i in col_names_clean:
+    #     ds[i].attrs['units'] = col_names_units[i]
+    #     ds[i].attrs['long_name'] = i
+    #     ds[i].attrs['standard_name'] = i
+    #     ds[i].attrs['axis'] = 'T'
+    #     ds[i].attrs['valid_min'] = np.min(col_names_values[i])
+    #     ds[i].attrs['valid_max'] = np.max(col_names_values[i])
+    #     ds[i].attrs['valid_delta'] = np.max(col_names_values[i]) - np.min(col_names_values[i])
+    #     ds[i].attrs['valid_range'] = [np.min(col_names_values[i]), np.max(col_names_values[i])]
+    #     ds[i].attrs['missing_value'] = -9999
+    #     ds[i].attrs['fill_value'] = -9999
+    #     ds[i].attrs['comment'] = 'Data from Guyane'
+    #     ds[i].attrs['reference'] = 'https://www.cnrs.fr/'
+    #     ds[i].attrs['history'] = 'Created by the CNRS'
+    #     ds[i].attrs['source'] = 'Data from Guyane'
+    #     ds[i].attrs['title'] = 'Data from Guyane'
+    #     ds[i].attrs['institution'] = 'CNRS'
+    #     ds[i].attrs['Conventions'] = 'CF-1.6'
 
     print(ds)
     
