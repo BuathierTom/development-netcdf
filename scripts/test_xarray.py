@@ -325,9 +325,9 @@ def test_doc():
         
     )    
     
+
     print(df)
     
-    df.to_netcdf('test_doc.nc')
     
         
     
