@@ -1,54 +1,32 @@
-import numpy as np
-from scipy.interpolate import griddata
-from netCDF4 import *
 import pandas as pd
+from netCDF4 import Dataset #type: ignore
 
-# Charger les données à partir du fichier Excel
-data = pd.read_excel("./data/doc_file_log.xlsx", keep_default_na=False)
+def convert_xlsx_to_netcdf(xlsx_file, netcdf_file):
+    # Lire les données du fichier XLSX en utilisant Pandas
+    df = pd.read_excel(xlsx_file)
 
-# Créer un fichier netCDF4 et définir ses dimensions
-dataset = Dataset('test_doc.nc', 'w', format='NETCDF4') #type: ignore
+    # Extraire les dimensions et les variables des données
+    dimensions = df.columns.tolist()
+    variables = df.values.T.tolist()
 
-# Extraire les valeurs de lat, lon et doc
-lat = data['lat'].values
-lon = data['lon'].values
-doc = data['doc'].values
+    # Créer un fichier NetCDF
+    nc_file = Dataset(netcdf_file, 'w')
 
+    # Créer les dimensions dans le fichier NetCDF
+    for dimension in dimensions:
+        nc_file.createDimension(dimension, len(df[dimension]))
 
-# Pour chaque valeur de la liste lat, lon et doc, vérifier si elle est vide et si elle est vide alors on la remplace par 0
-lat = [x if x != '' else 0 for x in lat]
-lon = [x if x != '' else 0 for x in lon]
-doc = [x if x != '' else 0 for x in doc]
+    # Créer les variables dans le fichier NetCDF
+    for i, variable in enumerate(variables):
+        nc_var = nc_file.createVariable(dimensions[i], variable.dtype, dimensions)
+        nc_var[:] = variable
 
-# Créer une grille de latitude et de longitude avec une résolution de 0,1 degré
-lat_grid = np.arange(np.floor(np.min(lat)), np.ceil(np.max(lat))+0.1, 0.1)
-lon_grid = np.arange(np.floor(np.min(lon)), np.ceil(np.max(lon))+0.1, 0.1)
+    # Fermer le fichier NetCDF
+    nc_file.close()
 
-# Créer une grille de points de latitude et de longitude
-lat_points, lon_points = np.meshgrid(lat_grid, lon_grid)
+    print("Conversion terminée avec succès!")
 
-# Interpoler les données sur la grille
-doc_grid = griddata((lat, lon), doc, (lat_points, lon_points), method='linear')
-
-latitude = dataset.createDimension('lat', None)
-longitude = dataset.createDimension('lon', None)
-
-# Créer des variables dans le fichier netCDF4
-lats = dataset.createVariable('lat', np.float32, (latitude,))
-lons = dataset.createVariable('lon', np.float32, (longitude,))
-docs = dataset.createVariable('doc', np.float32, (latitude, longitude))
-
-
-# Ajouter les valeurs aux variables
-docs[:] = doc_grid.astype(np.float32)
-lats[:] = lat_grid
-lons[:] = lon_grid
-
-# Ajouter des attributs aux variables
-docs.units = 'kg/m2'
-lats.units = 'degrees_north'
-lons.units = 'degrees_east'
-docs.long_name = 'Example tests'
-
-# Fermer le fichier netCDF4
-dataset.close()
+# Exemple d'utilisation
+xlsx_file = "./data/doc_file_log.xlsx"
+netcdf_file = "donnees.nc"
+convert_xlsx_to_netcdf(xlsx_file, netcdf_file)

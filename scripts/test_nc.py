@@ -4,6 +4,12 @@ import pandas as pd
 import xarray as xr
 from netCDF4 import *
 
+# A installer pour pouvoir utiliser les bibliothèques
+# pip install netCDF4 
+# pip install xarray
+# pip install pandas
+# pip install numpy
+
 """
     Programme a but de test pour avoir un fichier netcdf en utilisant la bibliothèque netCDF4
 """
@@ -19,36 +25,46 @@ lat = data['lat'].values
 lon = data['lon'].values
 doc = data['doc'].values
 
-print(lat)
+# Définir les limites de la grille de latitude et de longitude
+
+# lat = data['lat'].replace(to_replace = '', value = 0)
+
+# lon = data['lon'].replace(to_replace = '', value = 0)
+
+# doc = data['doc'].replace(to_replace = '', value = 0)
+
+# On ne considère pas les valeurs égales à -999
+lat = lat[lat != -999]
+lon = lon[lon != -999]
+doc = doc[doc != -999]
+
+print(doc)
+
+latitude = dataset.createDimension('lat', 1716)
+longitude = dataset.createDimension('lon', 1716)
+
+# Créer les variables lat, lon et doc
+lats = dataset.createVariable('lat', np.float64, ('lat',))
+lons = dataset.createVariable('lon', np.float64, ('lon',))
+
+docs = dataset.createVariable('doc', np.float64, ('lat', 'lon'))
 
 
+# on créé des listes arranger avec numpy de lat et lon entre -90 et 90 et que la liste soit de taille 1544
+lat = np.linspace(min(lat),max(lat), 1716)
+lon = np.linspace(min(lon),max(lon), 1716)
 
-# # Définir les limites de la grille de latitude et de longitud
-
-# On enleve les '' de toutes les listes
-lat = [x for x in lat if x != '']
-lon = [x for x in lon if x != '']
-doc = [x for x in doc if x != '']
-
-# on prend le plus petit de la liste
-lat_min = min(lat)
-
-lat_max = max(lat)
-lon_min = min(lon)
-lon_max = max(lon)
-
-latitude = dataset.createDimension('lat', len(lat))
-longitude = dataset.createDimension('lon', len(lon))
-
-# Créer des variables dans le fichier netCDF4
-docs = dataset.createVariable('doc', np.float32, (latitude, longitude))
-lats = dataset.createVariable('lat', np.float32, (latitude,))
-lons = dataset.createVariable('lon', np.float32, (longitude,))
-
+# On rajoute des valeurs à la liste doc pour qu'elle soit de taille 1716
+doc = np.append(doc, np.zeros(1716 - len(doc)))
 
 lats[:] = lat
 lons[:] = lon
-docs[:] = np.reshape(doc, (lat_min, lat_max))
+docs[:] = doc
+
+docs.units = 'µmol.L-1'
+lats.units = 'degrees_north'
+lons.units = 'degrees_east'
+docs.long_name = 'Dissolved Organic Carbon'
 
 
 
