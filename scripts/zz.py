@@ -14,15 +14,10 @@ lat = dataset.createDimension("latitude", len(df))
 lon = dataset.createDimension("longitude", len(df))
 
 # Création des variables
-latitude = dataset.createVariable("latitude", "f4", ("latitude",))
-longitude = dataset.createVariable("longitude", "f4", ("longitude",))
+# latitude = dataset.createVariable("latitude", "f4", ("latitude",))
+# longitude = dataset.createVariable("longitude", "f4", ("longitude",))
 doc = dataset.createVariable("doc", "f4", ("latitude", "longitude"))
 
-# Remplissage des variables avec les données du fichier XLSX
-latitude[:] = df["lat"].to_list()
-longitude[:] = df["lon"].to_list()
-
-print(latitude)
 
 # Conversion de la colonne "doc" en une liste Python
 doc_data = df["doc"].to_list()
