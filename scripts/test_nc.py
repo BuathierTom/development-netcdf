@@ -66,10 +66,6 @@ lats.units = 'degrees_north'
 lons.units = 'degrees_east'
 docs.long_name = 'Dissolved Organic Carbon'
 
-
-
-
-
 # Fermer le fichier netCDF4
 dataset.close()
 
