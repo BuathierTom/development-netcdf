@@ -5,7 +5,7 @@ from datetime import datetime
 
 df = pd.read_excel("./data/bresil.xlsx", keep_default_na=False)
 
-# On récupère les colonnes "jour" et "heure" et "doc" du fichier XLSX
+# on récupère les données
 jour = df["jour"].tolist()
 heure = df["heure"].tolist()
 # 
@@ -25,7 +25,46 @@ row = len(df) # 3334
 # On récupère seulement la date
 jour = [str(jour[i])[:10] for i in range(len(jour))]
 heure_str = [str(h) for h in heure]
-liste_combinee = [jour[i] + "T" + heure_str[i] for i in range(len(jour))]
+# si il y a pas d'hreures, on met 00:00:00
+for i in range(len(heure_str)):
+    if heure_str[i] == "":
+        heure_str[i] = "00:00:00"
+    else:
+        heure_str[i] = heure_str[i]
+
+# On convertit la date avec jour et heure_str en ce modèle : 1995-10-11T15:25:00Z
+liste_combinee = []
+for i in range(len(jour)):
+    date_str = jour[i] + "T" + heure_str[i] + "Z"
+    date = datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%SZ")
+    liste_combinee.append(date)
+    
+# Pour chla, mes, doc, poc on les definit comme float et si il y a pas de valeur, on met NaN
+for i in range(len(chla)):
+    if chla[i] == "":
+        chla[i] = np.nan
+    else:
+        chla[i] = float(chla[i])
+
+for i in range(len(mes)):
+    if mes[i] == "":
+        mes[i] = np.nan
+    else:
+        mes[i] = float(mes[i])
+
+for i in range(len(doc)):
+    if doc[i] == "":
+        doc[i] = np.nan
+    else:
+        doc[i] = float(doc[i])
+
+for i in range(len(poc)):
+    if poc[i] == "":
+        poc[i] = np.nan
+    else:
+        poc[i] = float(poc[i])
+
+
 
 # On créé un dataset avec les données
 ds = xr.Dataset(
@@ -41,7 +80,6 @@ ds = xr.Dataset(
         "doc": ("row", doc),
         "poc": ("row", poc),
     },
-    
 )
 
 # On ajoute les attributs   
@@ -54,6 +92,10 @@ ds["lon"].attrs["units"] = "degrees_east"
 ds["lon"].attrs["long_name"] = "Longitude"
 ds["lon"].attrs["standard_name"] = "longitude"
 ds["lon"].attrs["axis"] = "X"
+
+ds["time"].attrs["long_name"] = "Start Time"
+ds["time"].attrs["standard_name"] = "time"
+ds["time"].attrs["axis"] = "T"
 
 ds["profondeur"].attrs["units"] = "m"
 ds["profondeur"].attrs["long_name"] = "Profondeur"
